@@ -25,6 +25,7 @@ try
         Console.WriteLine("5) Add new record to Products table");
         Console.WriteLine("6) Edit a Product");
         Console.WriteLine("7) Display Products");
+        Console.WriteLine("8) Display Product details");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -492,6 +493,32 @@ try
                 }
 
             } while (productDisplayChoice.ToLower() != "q");
+        }
+        else if (choice == "8")
+        {
+            Console.WriteLine("Which Product Id would you like to know more abouit?");
+            var query = db.Products.OrderBy(p => p.ProductId);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.ProductId}) {item.ProductName}");
+            }
+
+            int id = int.Parse(Console.ReadLine());
+            logger.Info($"ProductId {id} selected");
+            Product product = db.Products.FirstOrDefault(p => p.ProductId == id);
+            Console.WriteLine("Product Name: " + product.ProductName);
+            Console.WriteLine("Supplier ID: " + product.SupplierId);
+            Supplier supplier = db.Suppliers.FirstOrDefault(s => s.SupplierId == product.SupplierId);
+            Console.WriteLine("Supplier: " + supplier.CompanyName);
+            Console.WriteLine("Category ID: " + product.CategoryId);
+            Category category = db.Categories.FirstOrDefault(c => c.CategoryId == product.CategoryId);
+            Console.WriteLine("Category: " + category.CategoryName);
+            Console.WriteLine("Quantity per unit: " + product.QuantityPerUnit);
+            Console.WriteLine("Unit price: " + product.UnitPrice);
+            Console.WriteLine("Units in stock: " + product.UnitsInStock);
+            Console.WriteLine("Units on order: " + product.UnitsOnOrder);
+            Console.WriteLine("Reorder level: " + product.ReorderLevel);
+            Console.WriteLine("Discontinued status: " + product.Discontinued);
         }
         Console.WriteLine();
 
