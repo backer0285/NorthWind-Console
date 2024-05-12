@@ -24,6 +24,7 @@ try
         Console.WriteLine("4) Display all Categories and their related products");
         Console.WriteLine("5) Add new record to Products table");
         Console.WriteLine("6) Edit a Product");
+        Console.WriteLine("7) Display Products");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -437,6 +438,60 @@ try
             {
                 logger.Error("Invalid Product Id");
             }
+        }
+        else if (choice == "7")
+        {
+            string productDisplayChoice;
+            do
+            {
+                Console.WriteLine("Which products would you like to view.");
+                Console.WriteLine("1) All Products");
+                Console.WriteLine("2) Discontinued Products");
+                Console.WriteLine("3) Active Products");
+                Console.WriteLine("\"q\" to quit");
+                productDisplayChoice = Console.ReadLine();
+
+                if (productDisplayChoice == "1")
+                {
+                    var query = db.Products.OrderBy(p => p.ProductId);
+
+                    Console.WriteLine($"{query.Count()} records returned");
+                    Console.WriteLine("Please note discontinued products appear in red.");
+
+                    foreach (var item in query)
+                    {
+                        if (item.Discontinued == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                        }
+                        else if (item.Discontinued == false)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                        }
+                        Console.WriteLine($"{item.ProductName}");
+                    }
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (productDisplayChoice == "2")
+                {
+                    var query = db.Products.Where(p => p.Discontinued == true);
+                    Console.WriteLine("Discontinued Items");
+                    foreach (var item in query)
+                    {
+                        Console.WriteLine($"{item.ProductName}");
+                    }
+                }
+                else if (productDisplayChoice == "3")
+                {
+                    var query = db.Products.Where(p => p.Discontinued == false);
+                    Console.WriteLine("Active Items");
+                    foreach (var item in query)
+                    {
+                        Console.WriteLine($"{item.ProductName}");
+                    }
+                }
+
+            } while (productDisplayChoice.ToLower() != "q");
         }
         Console.WriteLine();
 
