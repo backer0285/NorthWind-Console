@@ -29,6 +29,7 @@ try
         Console.WriteLine("9) Edit a Category");
         Console.WriteLine("10) Display all Categories");
         Console.WriteLine("11) Display all Categories and their related active products");
+        Console.WriteLine("12) Display Category and its related active products");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -604,6 +605,30 @@ try
                     {
                         Console.WriteLine($"\t{p.ProductName}");
                     }
+                }
+            }
+        }
+        else if (choice == "12")
+        {
+            var query = db.Categories.OrderBy(p => p.CategoryId);
+
+            Console.WriteLine("Select the category whose active products you want to display:");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            int id = int.Parse(Console.ReadLine());
+            Console.Clear();
+            logger.Info($"CategoryId {id} selected");
+            Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id);
+            Console.WriteLine($"{category.CategoryName} - {category.Description}");
+            foreach (Product p in category.Products)
+            {
+                if (p.Discontinued == false)
+                {
+                    Console.WriteLine($"\t{p.ProductName}");
                 }
             }
         }
