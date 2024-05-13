@@ -12,8 +12,6 @@ string path = Directory.GetCurrentDirectory() + "\\nlog.config";
 var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
 logger.Info("Program started");
 
-// QUESTION: is 2b already done?
-
 try
 {
     var db = new NWContext();
@@ -29,6 +27,7 @@ try
         Console.WriteLine("7) Display Products");
         Console.WriteLine("8) Display Product details");
         Console.WriteLine("9) Edit a Category");
+        Console.WriteLine("10) Display all Categories");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -582,6 +581,14 @@ try
             else
             {
                 logger.Error("Invalid Category Id");
+            }
+        }
+        else if (choice == "10")
+        {
+            var query = db.Categories.OrderBy(c => c.CategoryId);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.CategoryName} - {item.Description}");
             }
         }
         Console.WriteLine();
