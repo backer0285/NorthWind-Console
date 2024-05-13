@@ -28,6 +28,7 @@ try
         Console.WriteLine("8) Display Product details");
         Console.WriteLine("9) Edit a Category");
         Console.WriteLine("10) Display all Categories");
+        Console.WriteLine("11) Display all Categories and their related active products");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -589,6 +590,21 @@ try
             foreach (var item in query)
             {
                 Console.WriteLine($"{item.CategoryName} - {item.Description}");
+            }
+        }
+        else if (choice == "11")
+        {
+            var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.CategoryName}");
+                foreach (Product p in item.Products)
+                {
+                    if (p.Discontinued == false)
+                    {
+                        Console.WriteLine($"\t{p.ProductName}");
+                    }
+                }
             }
         }
         Console.WriteLine();
