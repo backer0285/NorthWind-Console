@@ -12,6 +12,8 @@ string path = Directory.GetCurrentDirectory() + "\\nlog.config";
 var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
 logger.Info("Program started");
 
+// QUESTION: is 2b already done?
+
 try
 {
     var db = new NWContext();
@@ -26,6 +28,7 @@ try
         Console.WriteLine("6) Edit a Product");
         Console.WriteLine("7) Display Products");
         Console.WriteLine("8) Display Product details");
+        Console.WriteLine("9) Edit a Category");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -343,7 +346,7 @@ try
         {
             // TODO: better validation
 
-            var query = db.Categories.OrderBy(p => p.CategoryId);
+            var query = db.Categories.OrderBy(c => c.CategoryId);
 
             Console.WriteLine("Select the category whose product you want to edit:");
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -496,7 +499,7 @@ try
         }
         else if (choice == "8")
         {
-            Console.WriteLine("Which Product Id would you like to know more abouit?");
+            Console.WriteLine("Which Product Id would you like to know more about?");
             var query = db.Products.OrderBy(p => p.ProductId);
             foreach (var item in query)
             {
@@ -519,6 +522,67 @@ try
             Console.WriteLine("Units on order: " + product.UnitsOnOrder);
             Console.WriteLine("Reorder level: " + product.ReorderLevel);
             Console.WriteLine("Discontinued status: " + product.Discontinued);
+        }
+        else if (choice == "9")
+        {
+            // TODO: better validation
+
+            var query = db.Categories.OrderBy(c => c.CategoryId);
+
+            Console.WriteLine("Select the category you want to edit:");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            int id = int.Parse(Console.ReadLine());
+            Console.Clear();
+            logger.Info($"CategoryId {id} selected");
+            Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
+            Console.WriteLine($"{category.CategoryName} - {category.Description}");
+
+            if (category != null)
+            {
+                Category updatedCategory = new Category();
+                Console.WriteLine("Enter the new category name.");
+                updatedCategory.CategoryName = Console.ReadLine();
+                Console.WriteLine("Enter the new category description.");
+                updatedCategory.Description = Console.ReadLine();
+
+                ValidationContext context = new ValidationContext(updatedCategory, null, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+
+                var isValid = Validator.TryValidateObject(updatedCategory, context, results, true);
+                if (isValid)
+                {
+                    // check for unique name
+                    if (db.Categories.Any(c => c.CategoryName == updatedCategory.CategoryName))
+                    {
+                        // generate validation error
+                        isValid = false;
+                        results.Add(new ValidationResult("Name exists", new string[] { "CategoryName" }));
+                    }
+                    else
+                    {
+                        logger.Info("Validation passed");
+                        updatedCategory.CategoryId = category.CategoryId;
+                        db.EditCategory(updatedCategory);
+                        logger.Info($"Category (id: {category.CategoryId}) updated");
+                    }
+                }
+                if (!isValid)
+                {
+                    foreach (var result in results)
+                    {
+                        logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+                    }
+                }
+            }
+            else
+            {
+                logger.Error("Invalid Category Id");
+            }
         }
         Console.WriteLine();
 

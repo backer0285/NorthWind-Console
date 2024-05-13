@@ -14,6 +14,7 @@ namespace NorthWind_Console.Model
         public int CategoryId { get; set; }
         [Required(ErrorMessage = "YO - Enter the name!")]
         public string CategoryName { get; set; }
+        [Required]
         public string Description { get; set; }
 
         public virtual ICollection<Product> Products { get; set; }
