@@ -70,6 +70,13 @@ namespace NorthWind_Console.Model
             this.SaveChanges();
         }
 
+        public void DeleteCategory(Category deletedCategpry)
+        {
+            Category category = this.Categories.Find(deletedCategpry.CategoryId);
+            Categories.Remove(category);
+            this.SaveChanges();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

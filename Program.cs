@@ -13,7 +13,7 @@ var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
 logger.Info("Program started");
 
 // TODO: better formatting
-// TODO: handle menu errors
+// TODO: refactor redundant coce, separate into methods
 
 try
 {
@@ -35,6 +35,7 @@ try
         Console.WriteLine("11) Display all Categories and their related active products");
         Console.WriteLine("12) Display Category and its related active products");
         Console.WriteLine("13) Delete a product record");
+        Console.WriteLine("14) Delete a category record");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -54,8 +55,6 @@ try
         }
         else if (choice == "2")
         {
-            // TODO: add validation
-
             Category category = new Category();
 
             bool invalidEntry = true;
@@ -161,9 +160,6 @@ try
         else if (choice == "5")
         {
             Product product = new Product();
-
-            // TODO - format error messages
-
             bool invalidEntry = true;
             while (invalidEntry)
             {
@@ -389,8 +385,6 @@ try
         }
         else if (choice == "6")
         {
-            // TODO: better validation
-
             var query = db.Categories.OrderBy(c => c.CategoryId);
 
             Console.WriteLine("Select the category whose product you want to edit:");
@@ -773,8 +767,6 @@ try
         }
         else if (choice == "9")
         {
-            // TODO: better validation
-
             var query = db.Categories.OrderBy(c => c.CategoryId);
 
             Console.WriteLine("Select the category you want to edit:");
@@ -782,7 +774,6 @@ try
             {
                 Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
             }
-
 
             var userEntry = Console.ReadLine();
             if (int.TryParse(userEntry, out int id))
@@ -930,7 +921,7 @@ try
         }
         else if (choice == "13")
         {
-            Console.WriteLine("Which Product Id would you like to delete (please note only products that do not show on historic orders are eligible for deletion?");
+            Console.WriteLine("Which Product Id would you like to delete (please note only products that do not show on historic orders are eligible for deletion");
             var query = db.Products.OrderBy(p => p.ProductId);
             foreach (var item in query)
             {
@@ -966,10 +957,48 @@ try
                 logger.Error("Invalid Product Id");
             }
         }
-        Console.WriteLine();
+        else if (choice == "14")
+        {
+            Console.WriteLine("Which Category Id would you like to delete (please note only categories unassociated with still existing products are eligible for deletion.");
+            var query = db.Categories.OrderBy(c => c.CategoryId);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+            }
+            var userEntry = Console.ReadLine();
 
-    } while (choice.ToLower() != "q");
-}
+            Category category = new Category();
+            if (int.TryParse(userEntry, out int id))
+            {
+                if (db.Categories.Any(c => c.CategoryId.Equals(id)))
+                {
+                    logger.Info($"CategoryId {id} selected");
+                    category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
+
+                    if (!db.Products.Any(p => p.CategoryId == category.CategoryId))
+                    {
+                        logger.Info($"CategoryId {id} deleted");
+                        db.DeleteCategory(category);
+                    }
+                    else
+                    {
+                        logger.Error("This category exists in historic records and cannot be deleted for data integrity purposes");
+                    }
+                }
+                else
+                {
+                    logger.Error("There are no Categories with that Id");
+                }
+            }
+            else
+            {
+                logger.Error("Invalid Category Id");
+            }
+        }
+            Console.WriteLine();
+
+        } while (choice.ToLower() != "q") ;
+    }
 catch (Exception ex)
 {
     logger.Error(ex.Message);
