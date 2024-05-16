@@ -31,11 +31,10 @@ try
         Console.WriteLine("7) Display Products");
         Console.WriteLine("8) Display Product details");
         Console.WriteLine("9) Edit a Category");
-        Console.WriteLine("10) Display all Categories");
-        Console.WriteLine("11) Display all Categories and their related active products");
-        Console.WriteLine("12) Display Category and its related active products");
-        Console.WriteLine("13) Delete a product record");
-        Console.WriteLine("14) Delete a category record");
+        Console.WriteLine("10) Display all Categories and their related active products");
+        Console.WriteLine("11) Display Category and its related active products");
+        Console.WriteLine("12) Delete a product record");
+        Console.WriteLine("13) Delete a category record");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -859,14 +858,6 @@ try
         }
         else if (choice == "10")
         {
-            var query = db.Categories.OrderBy(c => c.CategoryId);
-            foreach (var item in query)
-            {
-                Console.WriteLine($"{item.CategoryName} - {item.Description}");
-            }
-        }
-        else if (choice == "11")
-        {
             var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
             foreach (var item in query)
             {
@@ -880,7 +871,7 @@ try
                 }
             }
         }
-        else if (choice == "12")
+        else if (choice == "11")
         {
             var query = db.Categories.OrderBy(p => p.CategoryId);
 
@@ -919,7 +910,7 @@ try
                 logger.Error("Invalid Category Id");
             }
         }
-        else if (choice == "13")
+        else if (choice == "12")
         {
             Console.WriteLine("Which Product Id would you like to delete (please note only products that do not show on historic orders are eligible for deletion");
             var query = db.Products.OrderBy(p => p.ProductId);
@@ -957,7 +948,7 @@ try
                 logger.Error("Invalid Product Id");
             }
         }
-        else if (choice == "14")
+        else if (choice == "13")
         {
             Console.WriteLine("Which Category Id would you like to delete (please note only categories unassociated with still existing products are eligible for deletion.");
             var query = db.Categories.OrderBy(c => c.CategoryId);
