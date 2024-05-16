@@ -63,6 +63,13 @@ namespace NorthWind_Console.Model
             this.SaveChanges();
         }
 
+        public void DeleteProduct(Product deletedProduct)
+        {
+            Product product = this.Products.Find(deletedProduct.ProductId);
+            Products.Remove(product);
+            this.SaveChanges();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

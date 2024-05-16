@@ -34,6 +34,7 @@ try
         Console.WriteLine("10) Display all Categories");
         Console.WriteLine("11) Display all Categories and their related active products");
         Console.WriteLine("12) Display Category and its related active products");
+        Console.WriteLine("13) Delete a product record");
         Console.WriteLine("\"q\" to quit");
         choice = Console.ReadLine();
         Console.Clear();
@@ -925,6 +926,44 @@ try
             else
             {
                 logger.Error("Invalid Category Id");
+            }
+        }
+        else if (choice == "13")
+        {
+            Console.WriteLine("Which Product Id would you like to delete (please note only products that do not show on historic orders are eligible for deletion?");
+            var query = db.Products.OrderBy(p => p.ProductId);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"{item.ProductId}) {item.ProductName}");
+            }
+            var userEntry = Console.ReadLine();
+
+            Product product = new Product();
+            if (int.TryParse(userEntry, out int id))
+            {
+                if (db.Products.Any(p => p.ProductId.Equals(id)))
+                {
+                    logger.Info($"ProductId {id} selected");
+                    product = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+                    if (!db.OrderDetails.Any(od => od.ProductId == product.ProductId))
+                    {
+                        logger.Info($"ProductId {id} deleted");
+                        db.DeleteProduct(product);
+                    }
+                    else
+                    {
+                        logger.Error("This product exists in historic records and cannot be deleted for data integrity purposes");
+                    }
+                }
+                else
+                {
+                    logger.Error("There are no Products with that Id");
+                }
+            }
+            else
+            {
+                logger.Error("Invalid Product Id");
             }
         }
         Console.WriteLine();
